@@ -5,6 +5,7 @@ const config = require('../config');
 const twitchAPI = require('../lib/twitch-api');
 const userModel = require('../db/user');
 const channelModel = require('../db/channel');
+const jwt = require('../lib/jwt');
 
 
 const redirect_uri = `${config.TWITCH_CLIENT_REDIR_HOST}/auth/twitch/callback`;
@@ -40,21 +41,31 @@ router.get('/callback', async (req, res) => {
 
     try {
         const { 
-            data: { access_token: token }
+            data: { access_token: token, refresh_token }
         } = await authAPI.post(`/token?${qs}`);
-        const user =  await twitchAPI.getUser({ token });
-        // const bot = await botModel.findOne({ name: 'twitchghost' });
-        // if(!bot) {
-        //     await botModel.create({
-        //         name: 'twitchghost',
-        //         refresh_token: response.data.refresh_token
-        //     });
-        // }else{
-        //     bot.refresh_token = response.data.refresh_token;
-        //     await bot.save();
-        // }
+        const { id: twitchId } = await twitchAPI.getUser({ token });
+        const query = { twitchId };
+        const options = {
+            new: true,
+            upsert: true
+        };
+        const [ user, channel ] = await Promise.all([
+            userModel.findOneAndUpdate(
+                query,
+                { twitchId, refresh_token },
+                options
+            ),
+            channelModel.findOneAndUpdate(
+                query,
+                query,
+                options
+            )
+        ]);
+        const loginToken = await jwt.sign({ twitchId });
         res.json({
+            loginToken,
             user,
+            channel
         });
     } catch (error) {
         res.json({

@@ -8,7 +8,9 @@ const UserSchema = new Schema({
     refresh_token: {
         type: String,
         required: true,
-    }
+    }, 
+}, {
+        versionKey: false
 });
 
 const userModel = model('user', UserSchema);
