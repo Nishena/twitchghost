@@ -13,7 +13,6 @@ mongoose.connect('mongodb://localhost/', {
    useUnifiedTopology: true
 });
 
-
 const { connection: db } = mongoose;
 
 db.on('connected', () => {
