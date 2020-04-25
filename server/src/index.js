@@ -10,6 +10,10 @@ const config = require('./config');
 require('./db');
 const middlewares = require('./middlewares');
 
+const bot = require('./bot');
+
+bot.init();
+
 const app = express();
 app.use(cors());
 app.use(volleyball);

@@ -1,6 +1,7 @@
 const express = require('express');
 
 const channelModel = require('../db/channel');
+const { joinChannels, partChannel } = require('../bot');
 
 const router = express.Router();
 
@@ -23,6 +24,11 @@ router.patch('/:twitchId', async (req, res, next) => {
     
         if (!channel) {
             return next();
+        }
+        if(enabled) {
+            await joinChannels([ twitchId ]);
+        } else {
+            await partChannel(twitchId);
         }
         return res.json(channel);
     } catch (error) {
