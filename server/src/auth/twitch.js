@@ -15,7 +15,7 @@ const authAPI = axios.create({
     baseURL: authBaseUrl
 });
 
-const router = express.Router( );
+const router = express.Router();
 
 router.get('/', (req, res) => {
     const qs = new URLSearchParams({

@@ -33,17 +33,23 @@ async function getClient(token) {
             options: { debug: true }
         });
 
+        client.on('message', messageHandler);
+
         await client.connect();
     } catch (error) {
         console.error('Error connecting to twitch...', error);
     }
+
+    return client;
+}
+
+function getToken() {
+	return client.getOptions().identity.password;
 }
 
 async function init() {
     try {
-        const bot = await botModel.findOne({});
-        const { access_token: token } = await twitchAPI.getAccessToken(bot.refresh_token);
-        await getClient(token);
+        await getClient();
         const dbChannels = await channelModel.find({ enabled: true });
         const id = dbChannels.map(c => c.twitchId);
         await joinChannels(id);
@@ -55,7 +61,7 @@ async function init() {
 async function joinChannels(id) {
     await getClient();
     const channels = await twitchAPI.getUsers({
-        token: client.getOptions().identity.password,
+        token: getToken(),
         id
     });
     // console.log(channels);
@@ -67,20 +73,43 @@ async function joinChannels(id) {
     }
 }
 
-async function partChannel(id) {
+async function partChannels(id) {
     await getClient();
-    const [ channel ] = await twitchAPI.getUsers({
+    const channels = await twitchAPI.getUsers({
         token: client.getOptions().identity.password,
-        id,
+        id
     });
-    await Promise.all([
-        client.part(channel.login),
-        sleep(350)
-    ]);
+    // console.log(channels);
+    for (const channel of channels) {
+        await Promise.all([
+            client.part(channel.login),
+            sleep(350)
+        ]);
+    }
+}
+/**
+ * @param {string} channel
+ * @param {import('tmi.js').ChatUserstate} tags
+ * @param {string} message
+ * @param {string} self
+ */
+
+async function messageHandler(channel, tags, message, self) {
+    if(self || tags['message-type'] === 'whisper') {
+        return;
+    }
+    // if(message.startsWith('!echo'))
+    if(message.startsWith('!')) {
+        const args = message.slice(1).split(' ');
+        const command = args.shift().toLowerCase();
+        if(command === 'echo') {
+            await client.say(channel, `@${tags.username}`,  `${args.join(' ')}`);
+        }
+    }
 }
 
 module.exports = {
     init,
     joinChannels,
-    partChannel
+    partChannels
 };

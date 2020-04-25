@@ -34,6 +34,7 @@ async function getUser({ token } = {}) {
 }
 
 async function getUsers({ id = [], token }) {
+    if(!id.length) return [];
     const qs = new URLSearchParams();
     for(const n of id) {
         qs.append('id', n);
