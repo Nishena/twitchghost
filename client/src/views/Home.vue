@@ -22,17 +22,30 @@ export default {
     Button
   },
   created() {
-    window.addEventListener('message', event => {
-      console.log(event);
-    })
+    if(localStorage.token) {
+      return this.$router.push({ name: 'Dashboard' });
+    }
+    this.handleMessage = (event) => {
+      if(event.origin !== API_URL) {
+        return;
+      }
+      if(event.data.token) {
+        localStorage.token = event.data.token;
+        this.$router.push({ name: 'Dashboard' });
+      }
+    };
+    window.addEventListener('message', this.handleMessage);
+  },
+  destroyed() {
+    window.removeEventListener('message', this.handleMessage);
   },
   methods: {
     loginWithTwitch() {
       const h = 720;
       const w = 720;
-      const left = (screen.width / 2) - (w / 2);
-      const top = (screen.height / 2) - (w / 2);
-      const win = window.open(
+      const left = (window.screen.width / 2) - (w / 2);
+      const top = (window.screen.height / 2) - (w / 2);
+      window.open(
         `${API_URL}/auth/twitch?`,
         'Login with Twitch',
         `width=${w},height=${h},top=${top},left=${left}`

@@ -18,7 +18,10 @@
         if(token && window.opener) {
             console.log('token', token)
             window.opener.postMessage({ token }, 'http://localhost:8080');
+            document.cookie= 'token=';
+            window.close();
         }
+        setTimeout(() => window.close(), 1000);
     </script>
 </body>
 </html>
