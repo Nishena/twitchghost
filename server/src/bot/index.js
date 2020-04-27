@@ -2,6 +2,8 @@ const tmi = require('tmi.js');
 
 const botModel = require('../db/bot');
 const channelModel = require('../db/channel');
+const commandModel = require('../db/command');
+const globalCommandModel = require('../db/globalcommand');
 const twitchAPI = require('../lib/twitch-api');
 const { sleep } = require('../lib/utils');
 
@@ -87,6 +89,33 @@ async function partChannels(id) {
         ]);
     }
 }
+
+/**
+ * 
+ * @param {String} channelId 
+ * @param {String} command 
+ * @param {String[]} args
+ */
+
+async function commandHandler(context) {
+    const { reply, channelId, commandName } = context;
+    const [ channelCommand, globalCommand ] = await Promise.all([
+        commandModel.findOne({ channelId, name: commandName }),
+        globalCommandModel.findOne({ name: commandName })
+    ]);
+    const command = channelCommand || globalCommand;
+    if(!command) {
+        return;
+    }
+    if(command.replyText) {
+        reply(command.replyText);
+    } else {
+        // Do stuff
+        const commandFn = require(`./commands/${command.name}`);
+        commandFn(context);
+    }
+}
+
 /**
  * @param {string} channel
  * @param {import('tmi.js').ChatUserstate} tags
@@ -98,13 +127,12 @@ async function messageHandler(channel, tags, message, self) {
     if(self || tags['message-type'] === 'whisper') {
         return;
     }
-    // if(message.startsWith('!echo'))
+    // TODO: Handle other prefixes based on channel settings
     if(message.startsWith('!')) {
         const args = message.slice(1).split(' ');
         const command = args.shift().toLowerCase();
-        if(command === 'echo') {
-            await client.say(channel, `@${tags.username}`,  `${args.join(' ')}`);
-        }
+        const reply = msg => client.say(channel, msg);
+        commandHandler.call({ reply }, tags['room-id'], command, args);
     }
 }
 

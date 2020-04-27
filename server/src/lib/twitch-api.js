@@ -58,9 +58,22 @@ async function getAccessToken(refresh_token) {
     return data;
 }
 
+async function getStream(user_id) {
+    const qs = URLSearchParams({
+        user_id
+    });
+    const { data: { data } } = await helix.get(`/streams?${qs}`, {
+        headers: {
+            'Client-ID': config.TWITCH_CLIENT_ID
+        }
+    });
+    return data[0] || null;
+}
+
 module.exports = {
     authAPI,
     getUser,
     getUsers,
     getAccessToken,
+    getStream
 };

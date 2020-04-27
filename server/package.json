@@ -5,7 +5,8 @@
   "main": "ghost.js",
   "scripts": {
     "start": "node src/index.js",
-    "dev": "nodemon src/index.js"
+    "dev": "nodemon src/index.js",
+    "seeds": "node src/db/seeds/index.js"
   },
   "author": "",
   "license": "ISC",
@@ -13,11 +14,13 @@
     "@types/tmi.js": "^1.4.0",
     "axios": "^0.19.2",
     "cors": "^2.8.5",
+    "countdown": "^2.6.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "helmet": "^3.22.0",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.9.9",
+    "mustache": "^4.0.1",
     "tmi.js": "^1.5.0",
     "volleyball": "^1.5.1"
   },

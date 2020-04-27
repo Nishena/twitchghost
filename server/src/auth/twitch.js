@@ -22,7 +22,7 @@ router.get('/', (req, res) => {
         client_id: config.TWITCH_CLIENT_ID,
         redirect_uri,
         response_type: 'code',
-        scope: req.query.scope
+        scope: 'moderation:read'
     });
     const redirectUrl = `${authBaseUrl}/authorize?${qs}`;
 
