@@ -21,10 +21,15 @@ export default {
   components: {
     Button
   },
+  created() {
+    window.addEventListener('message', event => {
+      console.log(event);
+    })
+  },
   methods: {
     loginWithTwitch() {
-      const h = 540;
-      const w = 360;
+      const h = 720;
+      const w = 720;
       const left = (screen.width / 2) - (w / 2);
       const top = (screen.height / 2) - (w / 2);
       const win = window.open(

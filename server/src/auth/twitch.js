@@ -62,15 +62,16 @@ router.get('/callback', async (req, res) => {
             )
         ]);
         const loginToken = await jwt.sign({ twitchId });
-        res.json({
-            loginToken,
-            user,
-            channel
+        res.cookie('token', loginToken, {
+            secure: process.env.NODE_ENV === 'production',
+            domain: process.env.HOST,
+            path: '/'
         });
+        res.redirect('/');
     } catch (error) {
         res.json({
             message: error.message,
-            body: error.response ? error.response.data : error,
+            // body: error.response ? error.response.data : error,
         });
     }
 

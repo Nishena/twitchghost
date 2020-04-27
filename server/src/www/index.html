@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech&display=swap" rel="stylesheet">
+    <title>Logging In</title>
+    <style>
+        body {
+            font-family: 'Share Tech', sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <h1>Logging in...</h1>
+    <script>
+        const { token } = Object.fromEntries(document.cookie.split(';').map(n => n.split('=')));
+        if(token && window.opener) {
+            console.log('token', token)
+            window.opener.postMessage({ token }, 'http://localhost:8080');
+        }
+    </script>
+</body>
+</html>
