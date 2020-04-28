@@ -14,8 +14,7 @@
 
 <script>
 import Button from '../components/Button';
-
-const API_URL = window.location.hostname === 'localhost' ? 'http://localhost:8888' : 'to-do';
+import API_URL from '../API_URL';
 
 export default {
   components: {

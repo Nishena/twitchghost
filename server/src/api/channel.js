@@ -15,6 +15,19 @@ const ensureUserAccess = (req, res, next) => {
     next();
 };
 
+router.get('/:twitchId', ensureUserAccess, async (req, res, next) => {
+    const { twitchId } = req.params;
+    try {
+        const channel = await channelModel.findOne({ twitchId });
+        if(!channel) {
+            return next();
+        }
+        res.json(channel);
+    } catch (error) {
+        next(error);
+    }
+});
+
 router.patch('/:twitchId', ensureUserAccess, async (req, res, next) => {
     const { twitchId } = req.params;
     const { enabled } = req.body;
